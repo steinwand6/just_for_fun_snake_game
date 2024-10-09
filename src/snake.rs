@@ -42,7 +42,6 @@ impl Snake {
             return;
         }
         self.direction = direction;
-        self.move_snake();
     }
 
     pub fn move_snake(&mut self) {
@@ -56,6 +55,20 @@ impl Snake {
         self.body.push_front(head);
         self.body.push_front(new_head);
         self.body.pop_back();
+    }
+
+    pub fn check_collision(&self, (max_x, max_y): (u16, u16), block_size: f64) -> bool {
+        let (max_x, max_y) = (max_x as f64 * block_size, max_y as f64 * block_size);
+        println!(
+            "x: {}, y:{}, max_x: {}, max_y: {}",
+            self.body.front().unwrap().0,
+            self.body.front().unwrap().1,
+            max_x,
+            max_y
+        );
+        self.body
+            .iter()
+            .any(|(x, y)| *x < 0.0 || *y < 0.0 || *x >= max_x || *y >= max_y)
     }
 }
 

@@ -1,5 +1,7 @@
 mod snake;
 
+use std::process::exit;
+
 use piston_window::*;
 
 use snake::Direction;
@@ -16,6 +18,8 @@ fn main() {
     let (width, height) = BOARD_SIZE;
     let width_size = BLOCK_SIZE * (width as f64);
     let height_size = BLOCK_SIZE * (height as f64);
+
+    let mut timer = 0.0;
 
     let mut window: PistonWindow = WindowSettings::new("Snake Game", [width_size, height_size])
         .exit_on_esc(true)
@@ -37,5 +41,17 @@ fn main() {
                 _ => (),
             }
         }
+
+        e.update(|arg| {
+            timer += arg.dt;
+            if timer > 0.2 {
+                snake.move_snake();
+                if snake.check_collision(BOARD_SIZE, BLOCK_SIZE) {
+                    println!("snake died");
+                    exit(0);
+                }
+                timer = 0.0;
+            }
+        });
     }
 }
