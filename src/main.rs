@@ -18,15 +18,15 @@ fn main() {
             snake.draw_snake(&c, g);
         });
 
-        /* if let Event::Input(Input::Button(key), _) = e {
+        if let Event::Input(Input::Button(key), _) = e {
             match key.button {
-                Button::Keyboard(Key::W) => y -= 50.0,
-                Button::Keyboard(Key::A) => x -= 50.0,
-                Button::Keyboard(Key::D) => x += 50.0,
-                Button::Keyboard(Key::S) => y += 50.0,
+                Button::Keyboard(Key::W) => snake.turn(Direction::Up),
+                Button::Keyboard(Key::S) => snake.turn(Direction::Down),
+                Button::Keyboard(Key::A) => snake.turn(Direction::Left),
+                Button::Keyboard(Key::D) => snake.turn(Direction::Right),
                 _ => (),
             }
-        } */
+        }
     }
 }
 
@@ -34,6 +34,7 @@ struct Snake {
     color: [f32; 4],
     body: LinkedList<(f64, f64)>,
     tail: (f64, f64),
+    direction: Direction,
 }
 
 impl Snake {
@@ -44,12 +45,13 @@ impl Snake {
         body.push_back((50.0, 50.0));
         Self {
             color,
-            body: body,
+            body,
             tail: (50.0, 50.0),
+            direction: Direction::Right,
         }
     }
 
-    fn draw_snake(&self, c: &Context, g: &mut G2d) {
+    pub fn draw_snake(&self, c: &Context, g: &mut G2d) {
         self.body.iter().for_each(|(x, y)| {
             rectangle(
                 self.color,
@@ -58,5 +60,48 @@ impl Snake {
                 g,
             )
         });
+    }
+
+    pub fn turn(&mut self, direction: Direction) {
+        println!("{:?} {:?} -> {:?}", self.body, self.direction, direction);
+        if direction == Direction::opposite(&self.direction)
+        /* || direction == self.direction */
+        {
+            return;
+        }
+        self.direction = direction;
+        self.move_snake();
+    }
+
+    pub fn move_snake(&mut self) {
+        let head = self.body.pop_front().unwrap();
+        let new_head = match self.direction {
+            Direction::Up => (head.0, head.1 - 50.0),
+            Direction::Down => (head.0, head.1 + 50.0),
+            Direction::Left => (head.0 - 50.0, head.1),
+            Direction::Right => (head.0 + 50.0, head.1),
+        };
+        self.body.push_front(head);
+        self.body.push_front(new_head);
+        self.tail = self.body.pop_back().unwrap();
+    }
+}
+
+#[derive(PartialEq, Eq, Debug)]
+enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+impl Direction {
+    fn opposite(&self) -> Self {
+        match self {
+            Self::Up => Self::Down,
+            Self::Down => Self::Up,
+            Self::Left => Self::Right,
+            Self::Right => Self::Left,
+        }
     }
 }
