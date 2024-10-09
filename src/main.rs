@@ -2,19 +2,26 @@ use std::collections::LinkedList;
 
 use piston_window::*;
 
+const BLOCK_SIZE: f64 = 25.0;
+const BOARD_SIZE: (u16, u16) = (30, 30);
+
 fn main() {
-    let mut window: PistonWindow = WindowSettings::new("Snake Game", [750; 2])
+    let snake_color = [0.0, 0.5, 0.3, 1.0];
+    let mut snake = Snake::new(snake_color);
+
+    let board_color = [0.5, 0.5, 0.5, 1.0];
+    let (width, height) = BOARD_SIZE;
+    let width_size = BLOCK_SIZE * (width as f64);
+    let height_size = BLOCK_SIZE * (height as f64);
+
+    let mut window: PistonWindow = WindowSettings::new("Snake Game", [width_size, height_size])
         .exit_on_esc(true)
         .build()
         .unwrap();
 
-    // green of snake
-    let snake_color = [0.0, 0.5, 0.3, 1.0];
-    let mut snake = Snake::new(snake_color);
-
     while let Some(e) = window.next() {
         window.draw_2d(&e, |c, g, _| {
-            clear([0.5, 0.5, 0.5, 1.0], g);
+            clear(board_color, g);
             snake.draw_snake(&c, g);
         });
 
@@ -76,10 +83,10 @@ impl Snake {
     pub fn move_snake(&mut self) {
         let head = self.body.pop_front().unwrap();
         let new_head = match self.direction {
-            Direction::Up => (head.0, head.1 - 50.0),
-            Direction::Down => (head.0, head.1 + 50.0),
-            Direction::Left => (head.0 - 50.0, head.1),
-            Direction::Right => (head.0 + 50.0, head.1),
+            Direction::Up => (head.0, head.1 - BLOCK_SIZE),
+            Direction::Down => (head.0, head.1 + BLOCK_SIZE),
+            Direction::Left => (head.0 - BLOCK_SIZE, head.1),
+            Direction::Right => (head.0 + BLOCK_SIZE, head.1),
         };
         self.body.push_front(head);
         self.body.push_front(new_head);
