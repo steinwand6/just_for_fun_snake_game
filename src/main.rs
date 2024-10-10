@@ -1,9 +1,11 @@
+mod draw;
 mod snake;
 
 use std::process::exit;
 
 use piston_window::*;
 
+use draw::Window;
 use snake::Direction;
 use snake::Snake;
 
@@ -15,22 +17,13 @@ fn main() {
     let mut snake = Snake::new(snake_color, BLOCK_SIZE);
 
     let board_color = [0.5, 0.5, 0.5, 1.0];
-    let (width, height) = BOARD_SIZE;
-    let width_size = BLOCK_SIZE * (width as f64);
-    let height_size = BLOCK_SIZE * (height as f64);
 
     let mut timer = 0.0;
 
-    let mut window: PistonWindow = WindowSettings::new("Snake Game", [width_size, height_size])
-        .exit_on_esc(true)
-        .build()
-        .unwrap();
+    let mut window = Window::init_window(BOARD_SIZE, BLOCK_SIZE, board_color);
 
     while let Some(e) = window.next() {
-        window.draw_2d(&e, |c, g, _| {
-            clear(board_color, g);
-            snake.draw_snake(&c, g);
-        });
+        window.draw(&e, &snake);
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
             match key {

@@ -1,7 +1,5 @@
 use std::collections::LinkedList;
 
-use piston_window::*;
-
 pub struct Snake {
     color: [f32; 4],
     body: LinkedList<(f64, f64)>,
@@ -23,15 +21,12 @@ impl Snake {
         }
     }
 
-    pub fn draw_snake(&self, c: &Context, g: &mut G2d) {
-        self.body.iter().for_each(|(x, y)| {
-            rectangle(
-                self.color,
-                [*x, *y, self.block_size, self.block_size], // rectangle
-                c.transform,
-                g,
-            )
-        });
+    pub fn get_color(&self) -> [f32; 4] {
+        self.color
+    }
+
+    pub fn get_body(&self) -> &LinkedList<(f64, f64)> {
+        &self.body
     }
 
     pub fn turn(&mut self, direction: Direction) {
